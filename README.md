@@ -52,23 +52,29 @@ Vibe-Coded one-shot with Gemini 4 Argon (plan) and Gemini 3.8 Flash (implementat
 
 ## Usage
 
-### 1. Real-time Capture
+### Real-time Capture
 
 Capturing `Microsoft-Antimalware-Engine` requires administrator privileges. 
 
 
+Capture all Defenders log messages and print to console:
 ```powershell
-# Realtime console monitoring with inline event explanations
 dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- capture
-
-# Capture and record to JSON Lines file while filtering for powershell or cmd
-dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- capture -o trace.jsonl -p powershell
-
-# Filter for specific high-value detection & injection events
-dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- capture --event-id 8,53,63,74 -o detections.jsonl
 ```
 
+Capture log to file of all processes which contain "beacon" in its process name (like `beacon_1.exe`):
+```powershell
+dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- capture -o trace.jsonl -p beacon
+```
+
+Capture log to file of your C2 beacon with pid `666`:
+```powershell
+dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- capture -o trace.jsonl -p 666
+```
+
+
 Filtering:
+
   * `--path <pattern>`: Substring, wildcard, or regex matching on all path/file/image/registry fields.
   * `-p|--process <pattern>`: Match process name or PID (auto-resolved from OS and BmProcess events).
   * `--event-id <ids>` & `--exclude-id <ids>`: Target or exclude specific IDs (e.g. `--event-id 8,53,63,74`).
@@ -76,7 +82,7 @@ Filtering:
   * `-s|--search <text>`: Full-text search across all payload keys, values, and summaries.
 
 
-### 2. Replay Recorded Traces
+### Replay Recorded Traces
 
 ```powershell
 # Replay all events with colored output and inline explanations
@@ -89,7 +95,7 @@ dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- replay trac
 dotnet run --project src/DefenderObserver/DefenderObserver.csproj -- replay trace.jsonl --no-help
 ```
 
-### 3. Knowledge Base Lookup (`explain`)
+### Knowledge Base Lookup (`explain`)
 
 ```powershell
 # Look up explanation, opcode, and fields for SenseRemediation (Event 74)
